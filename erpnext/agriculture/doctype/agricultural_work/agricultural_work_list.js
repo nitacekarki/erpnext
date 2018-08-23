@@ -13,6 +13,10 @@ frappe.listview_settings['Agricultural Work'] = {
 
 			return [__("Completed"), "green"];
 
+		} else if (doc.status === 'Delayed') {
+
+			return [__("Delayed"), "red"];
+
 		}
 	}
 };
