@@ -62,4 +62,24 @@ def get_data():
 				}
 			]
 		},
+		{
+			"label": _("Livestock"),
+			"items": [
+				{
+					"type": "doctype",
+					"label": _("Animal Group"),
+					"name": "Animal Group",
+					"link": "Tree/Animal Group",
+					"description": _("Manage Animal Group Tree."),
+				},
+				{
+					"type": "doctype",
+					"name": "Animal"
+				},
+				{
+					"type": "doctype",
+					"name": "Livestock Settings"
+				},
+			]
+		}
 	]
