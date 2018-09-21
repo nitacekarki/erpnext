@@ -78,6 +78,10 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Animal Weight"
+				},
+				{
+					"type": "doctype",
 					"name": "Livestock Settings"
 				},
 			]
