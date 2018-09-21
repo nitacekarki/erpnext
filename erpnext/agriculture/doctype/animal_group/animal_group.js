@@ -9,29 +9,29 @@ frappe.ui.form.on('Animal Group', {
 				animal_group_name: frm.doc.name
 			},
 			callback: function (r) {
-				let animals = r.message;
+				// let animals = r.message;
 
-				if (animals != 0) {
-					animals.forEach((animal, index) => {
-						if (animal.animal_id_number) {
-							const serie = frappe.model.add_child(cur_frm.doc, "Animal Group Member", "members");
-							serie.animal_identifier = animal.name;
-							serie.animal_type = animal.animal_type;
-							serie.animal_id_number = animal.animal_id_number;
-							serie.animal_status = animal.animal_status;
+				// if (animals != 0) {
+				// 	animals.forEach((animal, index) => {
+				// 		if (animal.animal_id_number) {
+				// 			const serie = frappe.model.add_child(cur_frm.doc, "Animal Group Member", "members");
+				// 			serie.animal_identifier = animal.name;
+				// 			serie.animal_type = animal.animal_type;
+				// 			serie.animal_id_number = animal.animal_id_number;
+				// 			serie.animal_status = animal.animal_status;
 
-							cur_frm.refresh_field("serialized_animals");
-						} else {
-							const no_serie = frappe.model.add_child(cur_frm.doc, "Unserialized Animal Group Member", "unserialized_group_members");
-							no_serie.animal_identifier = animal.name;
-							no_serie.animal_type = animal.animal_type;
-							no_serie.animal_id_number = '';
-							no_serie.animal_status = animal.animal_status;
+				// 			cur_frm.refresh_field("members");
+				// 		} else {
+				// 			const no_serie = frappe.model.add_child(cur_frm.doc, "Unserialized Animal Group Member", "unserialized_group_members");
+				// 			no_serie.animal_identifier = animal.name;
+				// 			no_serie.animal_type = animal.animal_type;
+				// 			no_serie.animal_id_number = '';
+				// 			no_serie.animal_status = animal.animal_status;
 
-							cur_frm.refresh_field("not_animals_serialized");
-						}
-					});
-				}
+				// 			cur_frm.refresh_field("not_animals_serialized");
+				// 		}
+				// 	});
+				// }
 
 			}
 		});
