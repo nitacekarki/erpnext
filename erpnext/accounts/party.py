@@ -221,6 +221,14 @@ def get_party_account(party_type, party, company):
 
 	return account
 
+@frappe.whitelist()
+def get_party_bank_account(party_type, party):
+	return frappe.db.get_value('Bank Account', {
+		'party_type': party_type,
+		'party': party,
+		'is_default': 1
+	})
+
 def get_party_account_currency(party_type, party, company):
 	def generator():
 		party_account = get_party_account(party_type, party, company)
@@ -435,7 +443,7 @@ def get_timeline_data(doctype, name):
 	# fetch and append data from Activity Log
 	data += frappe.db.sql("""select {fields}
 		from `tabActivity Log`
-		where reference_doctype="{doctype}" and reference_name="{name}"
+		where reference_doctype={doctype} and reference_name={name}
 		and status!='Success' and creation > {after}
 		{group_by} order by creation desc
 		""".format(doctype=frappe.db.escape(doctype), name=frappe.db.escape(name), fields=fields,
