@@ -134,6 +134,9 @@ def install(country=None):
 		{'doctype': 'Customer Group', 'customer_group_name': _('Non Profit'), 'is_group': 0, 'parent_customer_group': _('All Customer Groups')},
 		{'doctype': 'Customer Group', 'customer_group_name': _('Government'), 'is_group': 0, 'parent_customer_group': _('All Customer Groups')},
 
+		# animal group
+		{'doctype': 'Animal Group', 'animal_group_name': _('All Animal Groups'), 'is_group': 1, 'name': _('All Animal Groups'), 'parent_animal_group': ''},
+
 		# supplier group
 		{'doctype': 'Supplier Group', 'supplier_group_name': _('All Supplier Groups'), 'is_group': 1, 'name': _('All Supplier Groups'), 'parent_supplier_group': ''},
 		{'doctype': 'Supplier Group', 'supplier_group_name': _('Services'), 'is_group': 0, 'parent_supplier_group': _('All Supplier Groups')},
