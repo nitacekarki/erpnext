@@ -40,9 +40,9 @@ def serie_animals(animal_group_name):
                                             fieldname=['name', 'animal_id_number'], as_dict=1)
         # Guarda el listado de animales pesados segun el ultimo registro de fecha para
         # luego ser retornado a Javascript y asignado a la tabla hija
-        last_weight = animal_w(animal_serie)
-        
-        return last_weight
+        animal_list_with_last_weight = animal_w(animal_serie)
+        #frappe.msgprint(_('Listado animales ultimo peso' + str(animal_list_with_last_weight)))
+        return animal_list_with_last_weight
     else:
         return 0
 
@@ -51,11 +51,20 @@ def verify_default_weight():
     # if frappe.db.exists('Livestock Settings', {'animal_default_weight_uom': uom}):
     try:
         uom = frappe.db.get_single_value('Livestock Settings','animal_default_weight_uom')
-        frappe.msgprint(_('Please set the default animal weight UOM in <a href= "#Form/Livestock Settings/">Livestock Settings</a>'))
-        # default_weight = frappe.db.get_values('Livestock Settings',
-        #                                     filters={'animal_default_weight_uom': animal_group_name},
-        #                                     fieldname=['name', 'animal_id_number'], as_dict=1)
     except:
         frappe.msgprint(_('Please set the default animal weight UOM in <a href= "#Form/Livestock Settings/">Livestock Settings</a>'))
+        uom = 'Pound'
     else:
         return uom
+
+@frappe.whitelist()
+def convert(from_uom, to_uom):
+    # frappe.msgprint(_('el valor de from_uom es: ' + from_uom))
+    if frappe.db.exists('UOM Conversion Factor', {'from_uom': 'Kg', 'to_uom': 'Pound'}):
+        conversion_factor = frappe.db.get_values('UOM Conversion Factor',
+                                            filters={'from_uom': from_uom, 'to_uom': to_uom},
+                                            fieldname=['value'], as_dict=True)
+        
+        return conversion_factor
+    else:
+        frappe.msgprint(_('Please create the conversion in <a href= "#Form/UOM Conversion Factor/">UOM Conversion Factor</a>'))
