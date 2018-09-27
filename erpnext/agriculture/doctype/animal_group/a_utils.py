@@ -45,3 +45,17 @@ def serie_animals(animal_group_name):
         return last_weight
     else:
         return 0
+
+@frappe.whitelist()
+def verify_default_weight():
+    # if frappe.db.exists('Livestock Settings', {'animal_default_weight_uom': uom}):
+    try:
+        uom = frappe.db.get_single_value('Livestock Settings','animal_default_weight_uom')
+        frappe.msgprint(_('Please set the default animal weight UOM in <a href= "#Form/Livestock Settings/">Livestock Settings</a>'))
+        # default_weight = frappe.db.get_values('Livestock Settings',
+        #                                     filters={'animal_default_weight_uom': animal_group_name},
+        #                                     fieldname=['name', 'animal_id_number'], as_dict=1)
+    except:
+        frappe.msgprint(_('Please set the default animal weight UOM in <a href= "#Form/Livestock Settings/">Livestock Settings</a>'))
+    else:
+        return uom

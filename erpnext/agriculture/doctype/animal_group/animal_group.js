@@ -56,12 +56,31 @@ function recorded_weights(frm) {
 
 function total_weight_non_serialized(frm) {
 	let t_w = 0;
+	// obtener la unidad de peso "default"  de settings
+	frappe.call({
+		method: "erpnext.agriculture.doctype.animal_group.a_utils.verify_default_weight",
+		callback: function (r) {
+			let animal_default_weight_uom = r.message;
+			console.log(animal_default_weight_uom);
+		}
+	});
 	//  Totaliza el total de peso para animales no serializados
 	frm.doc.unserialized_group_members.forEach((m, i) => {
 		t_w += flt(m.weight)
+		console.log('unidad de peso esta fila:' + m.weight_uom);
+		
+		// ir a livestock settings, y obtener valor del campo
+		
+		
+		// Comparar si la unidad de esta fila es igual a la uom de setting
+		//  1. Si la unidad de peso esta fila  no es igual a la unidad de peso default
+			// Convierta
+			
+		// 2. Caso contrario, la unidad es igual, solo tome el numero para la suma.
 	});
 
 	cur_frm.set_value('total_unserialized_weight', t_w);
+	console.log('hola mundo' + t_w);
 }
 
 frappe.ui.form.on('Animal Group', {
