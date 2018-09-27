@@ -1,40 +1,123 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Animal Group', {
-	refresh: function (frm) {
-		frappe.call({
-			method: "erpnext.agriculture.doctype.animal_group.a_utils.serie_animals",
-			args: {
-				animal_group_name: frm.doc.name
-			},
-			callback: function (r) {
-				// let animals = r.message;
+// Funcion para verificar item en member y asi evitar duplicados
+function find_item(frm, item) {
+	var state_a = false;
 
-				// if (animals != 0) {
-				// 	animals.forEach((animal, index) => {
-				// 		if (animal.animal_id_number) {
-				// 			const serie = frappe.model.add_child(cur_frm.doc, "Animal Group Member", "members");
-				// 			serie.animal_identifier = animal.name;
-				// 			serie.animal_type = animal.animal_type;
-				// 			serie.animal_id_number = animal.animal_id_number;
-				// 			serie.animal_status = animal.animal_status;
+	$.each(frm.doc.members || [], function (i, d) {
+		if (d.animal_identifier === item) {
+			state_a = true;
+		}
+	});
 
-				// 			cur_frm.refresh_field("members");
-				// 		} else {
-				// 			const no_serie = frappe.model.add_child(cur_frm.doc, "Unserialized Animal Group Member", "unserialized_group_members");
-				// 			no_serie.animal_identifier = animal.name;
-				// 			no_serie.animal_type = animal.animal_type;
-				// 			no_serie.animal_id_number = '';
-				// 			no_serie.animal_status = animal.animal_status;
+	return state_a;
+}
 
-				// 			cur_frm.refresh_field("not_animals_serialized");
-				// 		}
-				// 	});
-				// }
+function recorded_weights(frm) {
+	frappe.call({
+		method: "erpnext.agriculture.doctype.animal_group.a_utils.serie_animals",
+		args: {
+			animal_group_name: frm.doc.name
+		},
+		callback: function (r) {
+			let animals = r.message;
+			let total_weight = 0;
 
+			if (animals != 0) {
+				//  Recorre animal por animal
+				animals.forEach((animal, index) => {
+					// Si el animal consultado no existe en la tabla hija members se procede a agregar uno nuevo
+					// APLICA PARA ANIMALES SERIALIZADOS
+					if (!find_item(frm, animal[0]['animal_id'])) {
+						// Creacion nueva fila con sus respectivas propiedades
+						const serie = frappe.model.add_child(cur_frm.doc, "Animal Group Member", "members");
+						serie.animal_identifier = animal[0]['animal_id'];
+						serie.last_weight = animal[0]['weight'];
+						serie.weight_uom = animal[0]['weight_uom'];
+						serie.member_type = animal[0]['member_type'];
+						serie.animal_common_name = animal[0]['animal_identifier'];
+						serie.member = '';
+
+						cur_frm.refresh_field("members");
+					}
+				});
 			}
-		});
+			//  Totaliza el total de peso para animales serializados
+			frm.doc.members.forEach((member, i) => {
+				total_weight += flt(member.last_weight)
+			});
+
+			cur_frm.set_value('total_serialized_weight', total_weight);
+
+		}
+	});
+}
+
+function total_weight_non_serialized(frm) {
+	let t_w = 0;
+	//  Totaliza el total de peso para animales no serializados
+	frm.doc.unserialized_group_members.forEach((m, i) => {
+		t_w += flt(m.weight)
+	});
+
+	cur_frm.set_value('total_unserialized_weight', t_w);
+}
+
+frappe.ui.form.on('Animal Group', {
+	serialization: function (frm) {
+
+		if (frm.doc.serialization === 'Fungible/ Unserialized') {
+			total_weight_non_serialized(frm);
+			cur_frm.clear_table('members');
+			cur_frm.set_value('total_serialized_weight', '');
+			cur_frm.refresh_fields();
+		}
+
+		if (frm.doc.serialization === 'Uniquely Identified/ Serialized') {
+			recorded_weights(frm);
+			cur_frm.set_value('total_unserialized_weight', '');
+			cur_frm.refresh_fields();
+		}
+
+		if (frm.doc.serialization === 'Mixed') {
+			recorded_weights(frm);
+			total_weight_non_serialized(frm);
+		}
+
+	},
+	onload: function (frm) {
+
+		if (frm.doc.serialization === 'Fungible/ Unserialized') {
+			total_weight_non_serialized(frm);
+			cur_frm.clear_table('members');
+			cur_frm.set_value('total_serialized_weight', '');
+			cur_frm.refresh_fields();
+		}
+
+		if (frm.doc.serialization === 'Uniquely Identified/ Serialized') {
+			recorded_weights(frm);
+			cur_frm.set_value('total_unserialized_weight', '');
+			cur_frm.refresh_fields();
+		}
+
+		if (frm.doc.serialization === 'Mixed') {
+			recorded_weights(frm);
+			total_weight_non_serialized(frm);
+		}
+
+	}
+});
+
+frappe.ui.form.on("Unserialized Animal Group Member", {
+	unserialized_group_members_add: function (frm, cdt, cdn) {
+		total_weight_non_serialized(frm);
+	},
+	unserialized_group_members_remove: function (frm, cdt, cdn) {
+		total_weight_non_serialized(frm);
+	},
+	weight: function (frm, cdt, cdn) {
+		total_weight_non_serialized(frm);
 	}
 });
 
