@@ -1,6 +1,9 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
+function total(frm){
+	//cur_frm.set_value('total_group_weight', flt(frm.doc.total_serialized_weight + frm.doc.total_unserialized_weight));		
+}
 // Funcion para verificar item en member y asi evitar duplicados
 function find_item(frm, item) {
 	var state_a = false;
@@ -14,7 +17,7 @@ function find_item(frm, item) {
 	return state_a;
 }
 
-function recorded_weights(frm) {
+function total_seralized_animal_weight(frm) {
 	var animal_default_weight_uom = 0;
 	frappe.call({
 		method: "erpnext.agriculture.doctype.animal_group.a_utils.serie_animals",
@@ -23,7 +26,7 @@ function recorded_weights(frm) {
 		},
 		callback: function (r) {
 			let animals = r.message;
-			let total_weight = 0;
+			let total_serialized_weight = 0;
 
 			if (animals != 0) {
 				//  Recorre animal por animal
@@ -58,7 +61,7 @@ function recorded_weights(frm) {
 					frm.doc.members.forEach((member, i) => {
 						let this_row_weight_uom = member.weight_uom
 						// Comparar si la unidad de esta fila es igual a la uom de setting
-						console.log('Serialized weight UOM this row:' + this_row_weight_uom);
+						//console.log('Serialized weight UOM this row:' + this_row_weight_uom);
 						if (this_row_weight_uom !== animal_default_weight_uom) {
 							//  1. Si la unidad de peso esta fila  no es igual a la unidad de peso default
 							// Convierta
@@ -71,19 +74,24 @@ function recorded_weights(frm) {
 								callback: function (r) {
 									// assign the conversion factor from the server to a local variable
 									var conv_factor = r.message[0]['value'];
-									console.log('Serialized Weight was converted' + (member.last_weight * conv_factor));
+									//console.log('Serialized Weight was converted' + (member.last_weight * conv_factor));
 									// add the converted weight to the total weight tally variable
-									total_weight += flt(member.last_weight * conv_factor)
+									total_serialized_weight += flt(member.last_weight * conv_factor)
 									// Finally, set the value of the field for total unserialized weight
-									cur_frm.set_value('total_serialized_weight', total_weight);
+									cur_frm.set_value('total_serialized_weight', total_serialized_weight);
+									console.log('Serialized Weight was converted' + (member.last_weight * conv_factor));
+									cur_frm.set_value('total_group_weight', flt(cur_frm.doc.total_weight) + total_serialized_weight);
 									cur_frm.refresh_field("total_serialized_weight");
+									
 								}
-							
 							});
 						} else {
 							// 2. Caso contrario, la unidad es igual, solo tome el numero para la suma.
-							total_weight += flt(member.last_weight)
-							console.log('Serialized Weight was added' + (member.last_weight));
+							total_serialized_weight += flt(member.last_weight)
+							//console.log('Serialized Weight was added' + (member.last_weight));
+							cur_frm.set_value('total_serialized_weight', total_serialized_weight);
+							cur_frm.set_value('total_group_weight', flt(cur_frm.doc.total_weight) + total_serialized_weight);
+							cur_frm.refresh_field("total_serialized_weight");
 						}
 					})
 				}
@@ -93,7 +101,7 @@ function recorded_weights(frm) {
 }
 
 function total_weight_non_serialized(frm) {
-	let t_w = 0;
+	let total_unserialized_weight = 0;
 	var animal_default_weight_uom = 0;
 
 	// Obtain the default animal weight from livestock settings.
@@ -121,14 +129,19 @@ function total_weight_non_serialized(frm) {
 							var conv_factor = r.message[0]['value'];
 							console.log(m.weight * conv_factor);
 							// add the converted weight to the total weight tally variable
-							t_w += flt((m.weight * conv_factor))
+							total_unserialized_weight += flt((m.weight * conv_factor))
 							// Finally, set the value of the field for total unserialized weight
-							cur_frm.set_value('total_unserialized_weight', t_w);
+							cur_frm.set_value('total_unserialized_weight', total_unserialized_weight);
+							cur_frm.set_value('total_group_weight', flt(cur_frm.doc.total_weight) + total_unserialized_weight);
+							cur_frm.refresh_field("total_unserialized_weight");
 						}
 					});
 				} else {
 					// 2. Caso contrario, la unidad es igual, solo tome el numero para la suma.
-					t_w += flt(m.weight)
+					total_unserialized_weight += flt(m.weight)
+					cur_frm.set_value('total_unserialized_weight', total_unserialized_weight);
+					cur_frm.set_value('total_group_weight', flt(cur_frm.doc.total_weight) + total_unserialized_weight);
+					cur_frm.refresh_field("total_unserialized_weight");
 				}
 			});
 		}
@@ -140,20 +153,24 @@ frappe.ui.form.on('Animal Group', {
 
 		if (frm.doc.serialization === 'Fungible/ Unserialized') {
 			total_weight_non_serialized(frm);
+			total(frm);
 			cur_frm.clear_table('members');
 			cur_frm.set_value('total_serialized_weight', '');
 			cur_frm.refresh_fields();
 		}
 
 		if (frm.doc.serialization === 'Uniquely Identified/ Serialized') {
-			recorded_weights(frm);
+			total_seralized_animal_weight(frm);
+			total(frm);
 			cur_frm.set_value('total_unserialized_weight', '');
 			cur_frm.refresh_fields();
 		}
 
 		if (frm.doc.serialization === 'Mixed') {
-			recorded_weights(frm);
+			total_seralized_animal_weight(frm);
+			total(frm);
 			total_weight_non_serialized(frm);
+			cur_frm.refresh_fields();
 		}
 
 	},
@@ -161,20 +178,24 @@ frappe.ui.form.on('Animal Group', {
 
 		if (frm.doc.serialization === 'Fungible/ Unserialized') {
 			total_weight_non_serialized(frm);
+			total(frm);
 			cur_frm.clear_table('members');
 			cur_frm.set_value('total_serialized_weight', '');
 			cur_frm.refresh_fields();
 		}
 
 		if (frm.doc.serialization === 'Uniquely Identified/ Serialized') {
-			recorded_weights(frm);
+			total_seralized_animal_weight(frm);
+			total(frm);
 			cur_frm.set_value('total_unserialized_weight', '');
 			cur_frm.refresh_fields();
 		}
 
 		if (frm.doc.serialization === 'Mixed') {
-			recorded_weights(frm);
+			total_seralized_animal_weight(frm);
+			total(frm);
 			total_weight_non_serialized(frm);
+			cur_frm.refresh_fields();
 		}
 
 	}
@@ -183,12 +204,18 @@ frappe.ui.form.on('Animal Group', {
 frappe.ui.form.on("Unserialized Animal Group Member", {
 	unserialized_group_members_add: function (frm, cdt, cdn) {
 		total_weight_non_serialized(frm);
+		total(frm);
+		cur_frm.refresh_fields();
 	},
 	unserialized_group_members_remove: function (frm, cdt, cdn) {
 		total_weight_non_serialized(frm);
+		total(frm);
+		cur_frm.refresh_fields();
 	},
 	weight: function (frm, cdt, cdn) {
 		total_weight_non_serialized(frm);
+		total(frm);
+		cur_frm.refresh_fields();
 	}
 });
 

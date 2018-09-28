@@ -11,46 +11,83 @@ from frappe import throw, _
 from frappe.utils import formatdate, get_number_format_info
 from six import iteritems
 # imported to enable erpnext.accounts.utils.get_account_currency
-from erpnext.accounts.doctype.account.account import get_account_currency
+# from erpnext.accounts.doctype.account.account import get_account_currency
+
+# Copyright (c) 2015, Revant. and Contributors
+# License: GNU General Public License v3. See license.txt
+
+from __future__ import unicode_literals
+import frappe
+
+
+# @frappe.whitelist()
+# def get_children():
+# 	ctype = frappe.local.form_dict.get('ctype')
+# 	parent_field = 'parent_' + ctype.lower().replace(' ', '_')
+# 	parent = frappe.form_dict.get("parent_animal_group") or ""
+
+# 	return frappe.db.sql("""select name as value,
+# 		if(is_group='Yes', 1, 0) as expandable
+# 		from `tab{ctype}`
+# 		where docstatus < 2
+# 		and ifnull(`{parent_field}`,'') = %s
+# 		order by name""".format(ctype=frappe.db.escape(ctype), parent_field=frappe.db.escape(parent_field)),
+# 		parent, as_dict=1)
 
 @frappe.whitelist()
-# This already requires a root to be named in the tree.js file for the doctype.
-def get_children(doctype, parent, is_root=False):
-	# from erpnext.accounts.report.financial_statements import sort_accounts
+def add_node():
+	ctype = frappe.form_dict.get('ctype')
+	parent_field = 'parent_' + ctype.lower().replace(' ', '_')
+	name_field = ctype.lower().replace(' ', '_') + '_name'
 
-	parent_fieldname = 'parent_' + doctype.lower().replace(' ', '_')
-	fields = [
-		'name as value',
-		'is_group as expandable'
-	]
-	filters = [['docstatus', '<', 2]]
+	doc = frappe.new_doc(ctype)
+	doc.update({
+		name_field: frappe.form_dict['name_field'],
+		parent_field: frappe.form_dict['parent'],
+		"is_group": frappe.form_dict['is_group']
+	})
 
-	filters.append(['ifnull(`{0}`,"")'.format(parent_fieldname), '=', '' if is_root else parent])
+	doc.save()
 
-	if is_root:
-		fields += ['root_type', 'report_type', 'account_currency'] if doctype == 'Account' else []
-		filters.append(['company', '=', company])
 
-	else:
-		fields += ['account_currency'] if doctype == 'Account' else []
-		fields += [parent_fieldname + ' as parent']
+# @frappe.whitelist()
+# # This already requires a root to be named in the tree.js file for the doctype.
+# def get_children(doctype, parent, is_root=False):
+# 	# from erpnext.accounts.report.financial_statements import sort_accounts
 
-	acc = frappe.get_list(doctype, fields=fields, filters=filters)
+# 	parent_fieldname = 'parent_' + doctype.lower().replace(' ', '_')
+# 	fields = [
+# 		'name as value',
+# 		'is_group as expandable'
+# 	]
+# 	filters = [['docstatus', '<', 2]]
 
-# Por aca va lo de los pesos!
-# para cada item en la lista, obtiene la "moneda"
-	if doctype == 'Animal Group':
-		sort_accounts(acc, is_root, key="value")
-		company_currency = frappe.get_cached_value('Company',  company,  "default_currency")
-		# Aqui se hace la iteracion para popular los valores de la lista de arbol.
-		for each in acc:
-			each["company_currency"] = company_currency
-			each["balance"] = flt(get_balance_on(each.get("value"), in_account_currency=False))
+# 	filters.append(['ifnull(`{0}`,"")'.format(parent_fieldname), '=', '' if is_root else parent])
 
-			if each.account_currency != company_currency:
-				each["balance_in_account_currency"] = flt(get_balance_on(each.get("value")))
+# 	if is_root:
+# 		fields += ['root_type', 'report_type', 'account_currency'] if doctype == 'Account' else []
+# 		filters.append(['company', '=', company])
 
-	return acc
+# 	else:
+# 		fields += ['account_currency'] if doctype == 'Account' else []
+# 		fields += [parent_fieldname + ' as parent']
+
+# 	acc = frappe.get_list(doctype, fields=fields, filters=filters)
+
+# # Por aca va lo de los pesos!
+# # para cada item en la lista, obtiene la "moneda"
+# 	if doctype == 'Animal Group':
+# 		sort_accounts(acc, is_root, key="value")
+# 		company_currency = frappe.get_cached_value('Company',  company,  "default_currency")
+# 		# Aqui se hace la iteracion para popular los valores de la lista de arbol.
+# 		for each in acc:
+# 			each["company_currency"] = company_currency
+# 			each["balance"] = flt(get_balance_on(each.get("value"), in_account_currency=False))
+
+# 			if each.account_currency != company_currency:
+# 				each["balance_in_account_currency"] = flt(get_balance_on(each.get("value")))
+
+# 	return acc
 
 # @frappe.whitelist()
 # def add_ac(args=None):
