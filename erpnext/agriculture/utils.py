@@ -38,9 +38,11 @@ def get_children(doctype, parent, is_root=False):
 	acc = frappe.get_list(doctype, fields=fields, filters=filters)
 
 # Por aca va lo de los pesos!
+# para cada item en la lista, obtiene la "moneda"
 	if doctype == 'Animal Group':
 		sort_accounts(acc, is_root, key="value")
 		company_currency = frappe.get_cached_value('Company',  company,  "default_currency")
+		# Aqui se hace la iteracion para popular los valores de la lista de arbol.
 		for each in acc:
 			each["company_currency"] = company_currency
 			each["balance"] = flt(get_balance_on(each.get("value"), in_account_currency=False))
