@@ -13,13 +13,6 @@ from six import iteritems
 # imported to enable erpnext.accounts.utils.get_account_currency
 # from erpnext.accounts.doctype.account.account import get_account_currency
 
-# Copyright (c) 2015, Revant. and Contributors
-# License: GNU General Public License v3. See license.txt
-
-from __future__ import unicode_literals
-import frappe
-
-
 # @frappe.whitelist()
 # def get_children():
 # 	ctype = frappe.local.form_dict.get('ctype')
