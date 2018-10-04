@@ -16,7 +16,7 @@ frappe.treeview_settings["Animal Group"] = {
 	onrender: function (node) {
 		// Para cada elemento del arbol, se hace un evento de render.
 		// Esto lo descubrimos porque tiene dos elementos, y por lo tanto corre dos veces esta funcion.
-		console.log('Se hizo un render');
+		// console.log('Se hizo un render');
 		//console.log(cur_page);
 		let page = $(document);
 		// Evalue, si el nodo NO ES RAIZ.  Porque lo que esta adentro servira para todos los otros nodos.
@@ -29,11 +29,9 @@ frappe.treeview_settings["Animal Group"] = {
 			frappe.db.get_value("Animal Group", node.data.value, "total_group_weight")
 				.then((r) => {
 					if (r.message.total_group_weight) {
-						//console.log(r.message.total_serialized_weight);
 						// Aqui se SUMA los pesos totales del Grupo.
 						let x = page.find(`span[data-label="${node.data.value}"] .tree-label`);
 						x.text(`${x.text()} (${(r.message.total_group_weight + ' Lb')})`).css('color', '#4F4F4F');
-						// x.text(x.text() + ' ' + );
 					}
 				});
 		}
