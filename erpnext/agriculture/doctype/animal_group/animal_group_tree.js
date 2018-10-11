@@ -29,10 +29,9 @@ function calc_weight(node) {
 			// for the moment this cannot calculate the weight on the fly.
 			.then((r) => {
 				if (r.message.total_group_weight) {
-					let x = page.find(`span[data-label="${node.data.value}"] .tree-label`);
-					x.text(`${x.text()} (${(r.message.total_group_weight + ' Lb')})`).css('color', '#4F4F4F');
-				}
+                    let x = page.find(`span[data-label="${node.data.value}"] .tree-label`);
+					x.text(`${x.text()} (${(parseFloat(r.message.total_group_weight).toLocaleString('en') + ' Lb')})`).css('color', '#4F4F4F');	
+					}
 			});
-
-	}	
+	}
 }
