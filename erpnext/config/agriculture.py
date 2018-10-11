@@ -17,7 +17,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Location"
-				}
+				},
 				{
 					"type": "doctype",
 					"name": "Agricultural Task"
