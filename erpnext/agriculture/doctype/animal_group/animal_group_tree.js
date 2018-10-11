@@ -27,6 +27,7 @@ function calc_weight(node) {
 		frappe.db.get_value("Animal Group", node.data.value, "total_group_weight")
 			// This is frappe's shorthand callback function, talking to the server, obtaining the total_group_weight each group has assigned upon saving the doctype.
 			// for the moment this cannot calculate the weight on the fly.
+			// parseFloat changes the string data received to a number, and formats it.
 			.then((r) => {
 				if (r.message.total_group_weight) {
                     let x = page.find(`span[data-label="${node.data.value}"] .tree-label`);
