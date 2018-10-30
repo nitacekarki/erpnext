@@ -157,3 +157,12 @@ def is_in_location(point, vs):
 		j += 1
 
 	return inside
+
+@frappe.whitelist()
+def create_kanban_board_if_not_exists(crop_cycle):
+	from frappe.desk.doctype.kanban_board.kanban_board import quick_kanban_board
+
+	if not frappe.db.exists('Kanban Board', crop_cycle):
+		quick_kanban_board('Task', crop_cycle, 'status')
+
+	return True

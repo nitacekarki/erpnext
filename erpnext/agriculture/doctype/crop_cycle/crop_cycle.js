@@ -25,22 +25,20 @@ frappe.ui.form.on('Crop Cycle', {
 				obj_to_append: obj_to_append
 			});
 		});
-	},
-	onload: (frm) => {
 
 		if (frappe.model.can_read("Task")) {
 			frm.add_custom_button(__("Gantt Chart"), function () {
 				frappe.route_options = {
-					"project": frm.doc.name
+					"crop_cycle": frm.doc.name
 				};
 				frappe.set_route("List", "Task", "Gantt");
 			});
 
 			frm.add_custom_button(__("Kanban Board"), () => {
-				frappe.call('erpnext.projects.doctype.project.project.create_kanban_board_if_not_exists', {
-					project: frm.doc.project_name
+				frappe.call('erpnext.agriculture.doctype.crop_cycle.crop_cycle.create_kanban_board_if_not_exists', {
+					crop_cycle: frm.doc.name
 				}).then(() => {
-					frappe.set_route('List', 'Task', 'Kanban', frm.doc.project_name);
+					frappe.set_route('List', 'Task', 'Kanban', frm.doc.name);
 				});
 			});
 		}
