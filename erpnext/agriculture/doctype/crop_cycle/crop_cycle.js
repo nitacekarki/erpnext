@@ -45,7 +45,49 @@ frappe.ui.form.on('Crop Cycle', {
 			});
 		}
 
+	},
+	tasks_refresh: function (frm) {
+		var grid = frm.get_field('tasks').grid;
+		grid.wrapper.find('select[data-fieldname="status"]').each(function () {
+			if ($(this).val() === 'Open') {
+				$(this).addClass('input-indicator-open');
+			} else {
+				$(this).removeClass('input-indicator-open');
+			}
+		});
 	}
+});
+
+frappe.ui.form.on("Crop Cycle Task", {
+	edit_task: function (frm, doctype, name) {
+		var doc = frappe.get_doc(doctype, name);
+		if (doc.task_id) {
+			frappe.set_route("Form", "Task", doc.task_id);
+		} else {
+			frappe.msgprint(__("Save the document first."));
+		}
+	},
+
+	edit_timesheet: function (frm, cdt, cdn) {
+		// var child = locals[cdt][cdn];
+		// frappe.route_options = { "project": frm.doc.project_name, "task": child.task_id };
+		// frappe.set_route("List", "Timesheet");
+	},
+
+	make_timesheet: function (frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		frappe.model.with_doctype('Timesheet', function () {
+			var doc = frappe.model.get_new_doc('Timesheet');
+			var row = frappe.model.add_child(doc, 'time_logs');
+			row.project = frm.doc.project_name;
+			row.task = child.task_id;
+			frappe.set_route('Form', doc.doctype, doc.name);
+		})
+	},
+
+	status: function (frm, doctype, name) {
+		frm.trigger('tasks_refresh');
+	},
 });
 
 function is_in_land_unit(point, vs) {

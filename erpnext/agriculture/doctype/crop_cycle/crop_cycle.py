@@ -19,8 +19,7 @@ class CropCycle(Document):
 	
 	def onload(self):
 		"""Load project tasks for quick view"""
-		if not self.get('__unsaved') and not self.get("tasks"):
-			self.load_tasks()
+		self.load_tasks()
 
 	def after_insert(self):
 		self.create_crop_cycle_project()
@@ -28,6 +27,8 @@ class CropCycle(Document):
 
 	def on_update(self):
 		self.create_tasks_for_diseases()
+		self.delete_task()
+		self.load_tasks()
 
 	def set_missing_values(self):
 		crop = frappe.get_doc('Crop', self.crop)
@@ -40,9 +41,6 @@ class CropCycle(Document):
 
 	def create_crop_cycle_project(self):
 		crop = frappe.get_doc('Crop', self.crop)
-
-		# self.project = self.create_project(crop.period, crop.agriculture_task)
-		# self.create_task(crop.agriculture_task, self.project, self.start_date)
 		self.create_task(crop.agriculture_task, self.title, self.start_date)
 
 	def create_tasks_for_diseases(self):
@@ -56,17 +54,6 @@ class CropCycle(Document):
 	def import_disease_tasks(self, disease, start_date):
 		disease_doc = frappe.get_doc('Disease', disease)
 		self.create_task(disease_doc.treatment_task, self.name, start_date)
-
-	def create_project(self, period, crop_tasks):
-		project = frappe.new_doc("Project")
-		project.update({
-			"project_name": self.title,
-			"expected_start_date": self.start_date,
-			"expected_end_date": add_days(self.start_date, period - 1)
-		})
-		project.insert()
-
-		return project.name
 
 	def create_task(self, crop_tasks, project_name, start_date):
 		for crop_task in crop_tasks:
@@ -108,6 +95,14 @@ class CropCycle(Document):
 				})
 
 			return frappe.get_all("Task", "*", filters, order_by="exp_start_date asc")
+
+	def delete_task(self):
+		if not self.get('deleted_task_list'): return
+
+		for d in self.get('deleted_task_list'):
+			frappe.delete_doc("Task", d)
+
+		self.deleted_task_list = []
 
 	def reload_linked_analysis(self):
 		linked_doctypes = ['Soil Texture', 'Soil Analysis', 'Plant Analysis']
