@@ -67,9 +67,9 @@ frappe.ui.form.on("Crop Cycle Task", {
 	},
 
 	edit_timesheet: function (frm, cdt, cdn) {
-		// var child = locals[cdt][cdn];
-		// frappe.route_options = { "project": frm.doc.project_name, "task": child.task_id };
-		// frappe.set_route("List", "Timesheet");
+		var child = locals[cdt][cdn];
+		frappe.route_options = { "crop_cycle": frm.doc.name, "task": child.task_id };
+		frappe.set_route("List", "Timesheet");
 	},
 
 	make_timesheet: function (frm, cdt, cdn) {
@@ -77,7 +77,7 @@ frappe.ui.form.on("Crop Cycle Task", {
 		frappe.model.with_doctype('Timesheet', function () {
 			var doc = frappe.model.get_new_doc('Timesheet');
 			var row = frappe.model.add_child(doc, 'time_logs');
-			row.project = frm.doc.project_name;
+			row.crop_cycle = frm.doc.name;
 			row.task = child.task_id;
 			frappe.set_route('Form', doc.doctype, doc.name);
 		})
