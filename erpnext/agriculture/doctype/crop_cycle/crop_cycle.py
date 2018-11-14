@@ -16,10 +16,14 @@ class CropCycle(Document):
 	def validate(self):
 		self.set_missing_values()
 		self.load_tasks()
+		self.load_crop_inputs()
+		self.load_crop_harvest_items()
 	
 	def onload(self):
 		"""Load project tasks for quick view"""
 		self.load_tasks()
+		self.load_crop_inputs()
+		self.load_crop_harvest_items()
 
 	def after_insert(self):
 		self.create_crop_cycle_project()
@@ -29,6 +33,8 @@ class CropCycle(Document):
 		self.create_tasks_for_diseases()
 		self.delete_task()
 		self.load_tasks()
+		self.load_crop_inputs()
+		self.load_crop_harvest_items()
 
 	def set_missing_values(self):
 		crop = frappe.get_doc('Crop', self.crop)
@@ -55,13 +61,13 @@ class CropCycle(Document):
 		disease_doc = frappe.get_doc('Disease', disease)
 		self.create_task(disease_doc.treatment_task, self.name, start_date)
 
-	def create_task(self, crop_tasks, project_name, start_date):
+	def create_task(self, crop_tasks, crop_cycle_name, start_date):
 		for crop_task in crop_tasks:
 			task = frappe.new_doc("Task")
 			task.update({
 				"subject": crop_task.get("task_name"),
 				"priority": crop_task.get("priority"),
-				"crop_cycle": project_name,
+				"crop_cycle": crop_cycle_name,
 				"exp_start_date": add_days(start_date, crop_task.get("start_day") - 1),
 				"exp_end_date": add_days(start_date, crop_task.get("end_day") - 1)
 			})
@@ -95,6 +101,62 @@ class CropCycle(Document):
 				})
 
 			return frappe.get_all("Task", "*", filters, order_by="exp_start_date asc")
+
+	def load_crop_inputs(self):
+		"""Load `crop inputs` from the database"""
+		self.crop_cycle_input_items = []
+		for crop_input in self.get_crop_inputs():
+			crop_inputs_map = {
+				"item_code": crop_input.item_code,
+				"item_name": crop_input.item_name,
+				"qty": crop_input.qty,
+				"uom": crop_input.uom,
+				"expected_harvest_start": crop_input.expected_harvest_start,
+				"expected_harvest_end": crop_input.expected_harvest_end
+			}
+
+			self.append("crop_cycle_input_items", crop_inputs_map)
+
+	def get_crop_inputs(self):
+		if self.crop is None:
+			return {}
+		else:
+			filters = {"parent": self.crop}
+
+			# if self.get("deleted_task_list"):
+			# 	filters.update({
+			# 		'name': ("not in", self.deleted_task_list)
+			# 	})
+
+			return frappe.get_all("Crop Input Item", "*", filters, order_by="expected_harvest_start asc")
+
+	def load_crop_harvest_items(self):
+		"""Load `crop harvest items` from the database"""
+		self.crop_harvest_item_viability_window = []
+		for crop_harvest_item in self.get_crop_harvest_items():
+			crop_harvest_items_map = {
+				"item_code": crop_harvest_item.item_code_harvest,
+				"item_name": crop_harvest_item.item_name_harvest,
+				"qty": crop_harvest_item.qty,
+				"uom": crop_harvest_item.uom,
+				"expected_harvest_start": crop_harvest_item.expected_harvest_start,
+				"expected_harvest_end": crop_harvest_item.expected_harvest_end
+			}
+
+			self.append("crop_harvest_item_viability_window", crop_harvest_items_map)
+
+	def get_crop_harvest_items(self):
+		if self.crop is None:
+			return {}
+		else:
+			filters = {"parent": self.crop}
+
+			# if self.get("deleted_task_list"):
+			# 	filters.update({
+			# 		'name': ("not in", self.deleted_task_list)
+			# 	})
+
+			return frappe.get_all("Crop Harvest Item", "*", filters, order_by="expected_harvest_start asc")
 
 	def delete_task(self):
 		if not self.get('deleted_task_list'): return
