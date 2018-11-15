@@ -88,6 +88,26 @@ frappe.ui.form.on("Crop Cycle Task", {
 	},
 });
 
+frappe.ui.form.on("Crop Cycle Harvest Item", {
+	view_stock_entry: function (frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		frappe.route_options = { "crop_cycle": frm.doc.name };
+		frappe.set_route("List", "Stock Entry");
+	},
+	make_stock_entry: function (frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		frappe.model.with_doctype('Stock Entry', function () {
+			var doc = frappe.model.get_new_doc('Stock Entry');
+			doc.crop_cycle = frm.doc.name;
+			var row = frappe.model.add_child(doc, 'items');
+			row.item_code = child.item_code;
+			row.qty = child.qty;
+			row.uom = child.uom;
+			frappe.set_route('Form', doc.doctype, doc.name);
+		})
+	}
+});
+
 function is_in_land_unit(point, vs) {
 	// ray-casting algorithm based on
 	// http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html

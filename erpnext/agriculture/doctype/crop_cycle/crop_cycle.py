@@ -20,13 +20,13 @@ class CropCycle(Document):
 		self.load_crop_harvest_items()
 	
 	def onload(self):
-		"""Load project tasks for quick view"""
+		"""Load crop cycle tasks for quick view"""
 		self.load_tasks()
 		self.load_crop_inputs()
 		self.load_crop_harvest_items()
 
 	def after_insert(self):
-		self.create_crop_cycle_project()
+		self.create_crop_cycle_tasks()
 		self.create_tasks_for_diseases()
 
 	def on_update(self):
@@ -45,7 +45,7 @@ class CropCycle(Document):
 		if not self.row_spacing_uom:
 			self.row_spacing_uom = crop.row_spacing_uom
 
-	def create_crop_cycle_project(self):
+	def create_crop_cycle_tasks(self):
 		crop = frappe.get_doc('Crop', self.crop)
 		self.create_task(crop.agriculture_task, self.title, self.start_date)
 
