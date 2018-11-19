@@ -141,8 +141,6 @@ class CropCycle(Document):
 				"uom": crop_harvest_item.uom,
 				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
 				"expected_harvest_viability_date": add_days(self.start_date, crop_harvest_item.expected_harvest_end)
-				# "expected_harvest_start": crop_harvest_item.expected_harvest_start,
-				# "expected_harvest_end": crop_harvest_item.expected_harvest_end
 			}
 
 			self.append("crop_harvest_item_viability_window", crop_harvest_items_map)
