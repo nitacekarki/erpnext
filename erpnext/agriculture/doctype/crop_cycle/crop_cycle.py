@@ -68,8 +68,8 @@ class CropCycle(Document):
 				"subject": crop_task.get("task_name"),
 				"priority": crop_task.get("priority"),
 				"crop_cycle": crop_cycle_name,
-				"exp_start_date": add_days(start_date, crop_task.get("start_day") - 1),
-				"exp_end_date": add_days(start_date, crop_task.get("end_day") - 1)
+				"exp_start_date": add_days(start_date, crop_task.get("start_day")),
+				"exp_end_date": add_days(start_date, crop_task.get("end_day"))
 			})
 			task.insert()
 
@@ -111,8 +111,8 @@ class CropCycle(Document):
 				"item_name": crop_input.item_name,
 				"qty": crop_input.qty,
 				"uom": crop_input.uom,
-				"expected_harvest_start": crop_input.expected_harvest_start,
-				"expected_harvest_end": crop_input.expected_harvest_end
+				"expected_harvest_date": add_days(self.start_date, crop_input.expected_harvest_start),
+				"expected_harvest_viability_date": add_days(self.start_date, crop_input.expected_harvest_end)
 			}
 
 			self.append("crop_cycle_input_items", crop_inputs_map)
@@ -139,8 +139,10 @@ class CropCycle(Document):
 				"item_name": crop_harvest_item.item_name_harvest,
 				"qty": crop_harvest_item.qty,
 				"uom": crop_harvest_item.uom,
-				"expected_harvest_start": crop_harvest_item.expected_harvest_start,
-				"expected_harvest_end": crop_harvest_item.expected_harvest_end
+				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
+				"expected_harvest_viability_date": add_days(self.start_date, crop_harvest_item.expected_harvest_end)
+				# "expected_harvest_start": crop_harvest_item.expected_harvest_start,
+				# "expected_harvest_end": crop_harvest_item.expected_harvest_end
 			}
 
 			self.append("crop_harvest_item_viability_window", crop_harvest_items_map)
