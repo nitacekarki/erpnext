@@ -37,6 +37,7 @@ class CropCycle(Document):
 		self.load_tasks()
 		self.load_crop_inputs()
 		self.load_crop_harvest_items()
+		self.validate_creation()
 
 	def set_missing_values(self):
 		crop = frappe.get_doc('Crop', self.crop)
@@ -54,9 +55,9 @@ class CropCycle(Document):
 
 	def validate_creation(self):
 		for d in frappe.get_all('Crop Cycle',
-			fields=['end_date', 'name'],
+			fields=['end_date', 'name', 'linked_location'],
 			filters={'docstatus': 1}):
-			if (getdate(self.start_date) <= d.end_date):
+			if (getdate(self.start_date) <= d.end_date) and (self.linked_location == d.linked_location):
 				frappe.throw(_('''There is already a crop cycle <a href= "#Form/Crop Cycle/{0}"><b>{0}</b></a>
 				 				within the selected date range, please add one more day to the start date.''').format(d.name))
 
@@ -243,3 +244,8 @@ def create_kanban_board_if_not_exists(crop_cycle):
 		quick_kanban_board('Task', crop_cycle, 'status')
 
 	return True
+
+@frappe.whitelist()
+def validate_area_location(location, name):
+	area = frappe.get_value('Location', name, 'area')
+	frappe.msgprint(_(str(area)))

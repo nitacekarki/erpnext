@@ -45,7 +45,7 @@ frappe.ui.form.on('Crop Cycle', {
 
 	},
 	tasks_refresh: function (frm) {
-		var grid = frm.get_field('tasks').grid;
+		var grid = frm.get_fields('tasks').grid;
 		grid.wrapper.find('select[data-fieldname="status"]').each(function () {
 			if ($(this).val() === 'Open') {
 				$(this).addClass('input-indicator-open');
@@ -53,6 +53,18 @@ frappe.ui.form.on('Crop Cycle', {
 				$(this).removeClass('input-indicator-open');
 			}
 		});
+	},
+	linked_location: function (frm) {
+		if (frm.doc.linked_location && (frm.doc.planting_units_crop_cycle == 'Per Area')) {
+			frappe.db.get_value("Location", frm.doc.linked_location, "area")
+				.then((r) => {
+					if (r.message.area == 0) {
+						frappe.throw(__(`The location 
+											<a href= '#Form/Location/${frm.doc.linked_location}'><b>${frm.doc.linked_location}</b></a> 
+											you have selected does not have a selected area.`));
+					}
+				});
+		}
 	}
 });
 
