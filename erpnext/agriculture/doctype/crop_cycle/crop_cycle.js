@@ -111,6 +111,8 @@ frappe.ui.form.on("Crop Cycle Harvest Item", {
 		frappe.model.with_doctype('Stock Entry', function () {
 			var doc = frappe.model.get_new_doc('Stock Entry');
 			doc.crop_cycle = frm.doc.name;
+			doc.from_warehouse = frm.doc.linked_warehouse;
+			doc.purpose = 'Material Receipt';
 			doc.posting_date = child.expected_harvest_viability_date;
 			var row = frappe.model.add_child(doc, 'items');
 			row.item_code = child.item_code;
