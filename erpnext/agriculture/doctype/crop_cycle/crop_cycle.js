@@ -65,7 +65,25 @@ frappe.ui.form.on('Crop Cycle', {
 					}
 				});
 		}
-	}
+	},
+	// before_save: function (frm) {
+	// 	frappe.db.get_value("Location", frm.doc.linked_location, "area")
+	// 		.then((r) => {
+	// 			// console.log(r.message.area);
+	// 			var area = r.message.area;
+	// 			frappe.db.get_value("Location", frm.doc.linked_location, "area_uom")
+	// 				.then((r) => {
+	// 					console.log(r.message.area_uom + ' ' + area);
+
+	// 					// frm.doc.crop_cycle_input_items.forEach(function (item, i) {
+	// 					// 	console.log(item.qty * area);
+	// 					// 	frm.doc.crop_cycle_input_items[i].qty = item.qty * area;
+	// 					// 	// cur_frm.refresh_field("crop_cycle_input_items");
+	// 					// });
+
+	// 				});
+	// 		});
+	// }
 });
 
 frappe.ui.form.on("Crop Cycle Task", {

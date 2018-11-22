@@ -125,7 +125,7 @@ class CropCycle(Document):
 			crop_inputs_map = {
 				"item_code": crop_input.item_code,
 				"item_name": crop_input.item_name,
-				"qty": crop_input.qty,
+				"qty": (float(crop_input.qty) * float(self.area)),
 				"uom": crop_input.uom,
 				"valuation_rate": crop_input.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_input.expected_harvest_start),
@@ -156,7 +156,7 @@ class CropCycle(Document):
 			crop_harvest_items_map = {
 				"item_code": crop_harvest_item.item_code_harvest,
 				"item_name": crop_harvest_item.item_name_harvest,
-				"qty": crop_harvest_item.qty,
+				"qty": (float(crop_harvest_item.qty) * float(self.area)),
 				"uom": crop_harvest_item.uom,
 				"valuation_rate": crop_harvest_item.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
