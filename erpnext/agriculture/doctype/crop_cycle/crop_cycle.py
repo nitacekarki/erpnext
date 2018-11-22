@@ -127,8 +127,11 @@ class CropCycle(Document):
 				"item_name": crop_input.item_name,
 				"qty": crop_input.qty,
 				"uom": crop_input.uom,
+				"valuation_rate": crop_input.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_input.expected_harvest_start),
-				"expected_harvest_viability_date": add_days(self.start_date, crop_input.expected_harvest_end)
+				"expected_harvest_viability_date": add_days(self.start_date, crop_input.expected_harvest_end),
+				"source_warehouse": crop_input.source_warehouse,
+				"target_warehouse": crop_input.target_warehouse
 			}
 
 			self.append("crop_cycle_input_items", crop_inputs_map)
@@ -155,8 +158,11 @@ class CropCycle(Document):
 				"item_name": crop_harvest_item.item_name_harvest,
 				"qty": crop_harvest_item.qty,
 				"uom": crop_harvest_item.uom,
+				"valuation_rate": crop_harvest_item.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
-				"expected_harvest_viability_date": add_days(self.start_date, crop_harvest_item.expected_harvest_end)
+				"expected_harvest_viability_date": add_days(self.start_date, crop_harvest_item.expected_harvest_end),
+				"source_warehouse": crop_harvest_item.source_warehouse,
+				"target_warehouse": crop_harvest_item.target_warehouse
 			}
 
 			self.append("crop_harvest_item_viability_window", crop_harvest_items_map)
