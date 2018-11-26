@@ -37,7 +37,6 @@ class CropCycle(Document):
 		self.load_tasks()
 		self.load_crop_inputs()
 		self.load_crop_harvest_items()
-		self.validate_creation()
 
 	def set_missing_values(self):
 		crop = frappe.get_doc('Crop', self.crop)

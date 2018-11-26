@@ -1237,11 +1237,11 @@
  "issingle": 0,
  "istable": 0,
  "max_attachments": 0,
- "modified": "2018-11-24 23:36:32.425792",
+ "modified": "2018-11-25 00:29:49.299349",
  "modified_by": "Administrator",
  "module": "Agriculture",
  "name": "Crop Cycle",
- "name_case": "",
+ "name_case": "UPPER CASE",
  "owner": "Administrator",
  "permissions": [
   {
@@ -1287,9 +1287,10 @@
  "read_only": 0,
  "read_only_onload": 0,
  "restrict_to_domain": "Agriculture",
- "show_name_in_global_search": 0,
+ "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "title_field": "",
  "track_changes": 1,
  "track_seen": 0,
  "track_views": 0
