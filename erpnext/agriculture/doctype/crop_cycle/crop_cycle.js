@@ -44,7 +44,7 @@ frappe.ui.form.on('Crop Cycle', {
 		}
 
 	},
-	tasks_refresh: function (frm) {
+	tasks_refresh: (frm) => {
 		var grid = frm.get_fields('tasks').grid;
 		grid.wrapper.find('select[data-fieldname="status"]').each(function () {
 			if ($(this).val() === 'Open') {
@@ -54,7 +54,7 @@ frappe.ui.form.on('Crop Cycle', {
 			}
 		});
 	},
-	linked_location: function (frm) {
+	linked_location: (frm) => {
 		if (frm.doc.linked_location && (frm.doc.planting_units_crop_cycle == 'Per Area')) {
 			frappe.db.get_value("Location", frm.doc.linked_location, "area")
 				.then((r) => {
@@ -65,6 +65,28 @@ frappe.ui.form.on('Crop Cycle', {
 					}
 				});
 		}
+	},
+	before_save: (frm) => {
+		// Frappe Call
+		frappe.call({
+			method: 'erpnext.agriculture.doctype.crop_cycle.crop_cycle.validate_creation',
+			args: {
+				location: frm.doc.linked_location,
+				start_date: frm.doc.start_date
+			},
+			callback: (r) => {
+				console.log(r.message);
+				if (r.message) {
+					cur_frm.set_value('start_date', r.message[0]);
+					refresh_field('start_date');
+
+					frappe.throw(__("There is already a crop cycle \
+									<a href= '#Form/Crop Cycle/{0}'><b>{0}</b></a>. \
+									within the selected date range. \
+									One more day will be added to fulfill the crop cycle.", [__(r.message[1])]));
+				}
+			}
+		});
 	}
 });
 

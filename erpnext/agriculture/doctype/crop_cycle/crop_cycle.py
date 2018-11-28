@@ -19,7 +19,6 @@ class CropCycle(Document):
 		self.load_crop_inputs()
 		self.load_crop_harvest_items()
 		self.validate_dates()
-		self.validate_creation()
 	
 	def onload(self):
 		"""Load crop cycle tasks for quick view"""
@@ -51,14 +50,6 @@ class CropCycle(Document):
 		if self.start_date and self.end_date:
 			if getdate(self.end_date) < getdate(self.start_date):
 				frappe.throw(_("Expected End Date can not be less than Expected Start Date"))
-
-	def validate_creation(self):
-		for d in frappe.get_all('Crop Cycle',
-			fields=['end_date', 'name', 'linked_location'],
-			filters={'docstatus': 1, 'linked_location': self.linked_location}):
-			if (getdate(self.start_date) <= d.end_date):
-				frappe.throw(_('''There is already a crop cycle <a href= "#Form/Crop Cycle/{0}"><b>{0}</b></a>
-				 				within the selected date range, please add one more day to the start date.''').format(d.name))
 
 	def create_crop_cycle_tasks(self):
 		crop = frappe.get_doc('Crop', self.crop)
@@ -249,3 +240,13 @@ def create_kanban_board_if_not_exists(crop_cycle):
 		quick_kanban_board('Task', crop_cycle, 'status')
 
 	return True
+
+@frappe.whitelist()
+def validate_creation(location, start_date):
+	for d in frappe.get_all('Crop Cycle',
+		fields=['end_date', 'name', 'linked_location'],
+		filters={'docstatus': 1, 'linked_location': location}):
+
+		if (getdate(start_date) <= d.end_date):
+
+			return [add_days(d.end_date, 1), d.name]
