@@ -26,7 +26,7 @@ frappe.ui.form.on('Crop', {
 		frappe.call({
 			method: "erpnext.agriculture.doctype.crop.crop.get_time_uom",
 			callback: function (r) {
-				// let time_unit_array = r.message;
+				let time_unit_array = r.message;
 				frm.set_df_property("uom_date", "options", time_unit_array);
 				frm.set_df_property("date_uom_crop_cycle", "options", time_unit_array);
 			}
