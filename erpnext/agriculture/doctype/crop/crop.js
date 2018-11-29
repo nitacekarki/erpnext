@@ -37,6 +37,9 @@ frappe.ui.form.on('Crop', {
 	},
 	date_uom_crop_cycle: (frm) => {
 		calculate_crop_cycle_qty(frm);
+	},
+	on_trash: (frm) => {
+		console.log('Se elimino el documento');
 	}
 });
 

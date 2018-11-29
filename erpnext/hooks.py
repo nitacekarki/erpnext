@@ -228,6 +228,9 @@ doc_events = {
 	},
 	"Contact":{
 		"on_trash": "erpnext.support.doctype.issue.issue.update_issue"
+	},
+	"Crop Cycle":{
+		"on_trash": "erpnext.agriculture.doctype.crop_cycle.crop_cycle.eliminate_linked_tasks"
 	}
 }
 

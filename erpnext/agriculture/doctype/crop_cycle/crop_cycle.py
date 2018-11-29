@@ -109,7 +109,7 @@ class CropCycle(Document):
 
 	def load_crop_inputs(self):
 		"""Load `crop inputs` from the database"""
-		# self.crop_cycle_input_items = [] :TODO: SERA EDITABLE?
+		self.crop_cycle_input_items = [] # :TODO: SERA EDITABLE?
 		for crop_input in self.get_crop_inputs():
 			crop_inputs_map = {
 				"item_code": crop_input.item_code,
@@ -139,7 +139,7 @@ class CropCycle(Document):
 
 	def load_crop_harvest_items(self):
 		"""Load `crop harvest items` from the database"""
-		# self.crop_harvest_item_viability_window = [] TODO: SERIA EDITABLE?
+		self.crop_harvest_item_viability_window = [] # TODO: SERIA EDITABLE?
 		for crop_harvest_item in self.get_crop_harvest_items():
 			crop_harvest_items_map = {
 				"item_code": crop_harvest_item.item_code_harvest,
@@ -247,3 +247,15 @@ def validate_creation(location, start_date):
 		if (getdate(start_date) <= d.end_date):
 
 			return [add_days(d.end_date, 1), d.name]
+
+def prueliminar(doc, method=None):
+	'''Eliminta tasks that were linked to the crop cycle'''
+	for d in frappe.get_all('Task',
+		fields=['name', 'crop_cycle'],
+		filters={'status': 'Open' or 'Cancel', 'crop_cycle': doc.title}):
+		current_task=frappe.get_doc("Task", d.name)
+		current_task.crop_cycle=""
+		current_task.save()
+		current_task.delete()
+
+		frappe.msgprint(_('Se elimino la tarea ' + d.name))
