@@ -89,8 +89,7 @@ class CropCycle(Document):
 				"start_date": task.exp_start_date,
 				"end_date": task.exp_end_date,
 				"description": task.description,
-				"task_id": task.name,
-				"task_weight": task.task_weight
+				"task_id": task.name
 			}
 
 			self.append("tasks", task_map)
@@ -110,7 +109,7 @@ class CropCycle(Document):
 
 	def load_crop_inputs(self):
 		"""Load `crop inputs` from the database"""
-		self.crop_cycle_input_items = []
+		# self.crop_cycle_input_items = [] :TODO: SERA EDITABLE?
 		for crop_input in self.get_crop_inputs():
 			crop_inputs_map = {
 				"item_code": crop_input.item_code,
@@ -120,8 +119,7 @@ class CropCycle(Document):
 				"valuation_rate": crop_input.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_input.expected_harvest_start),
 				"expected_harvest_viability_date": add_days(self.start_date, crop_input.expected_harvest_end),
-				"source_warehouse": crop_input.source_warehouse,
-				"target_warehouse": crop_input.target_warehouse
+				"source_warehouse": crop_input.source_warehouse
 			}
 
 			self.append("crop_cycle_input_items", crop_inputs_map)
@@ -141,7 +139,7 @@ class CropCycle(Document):
 
 	def load_crop_harvest_items(self):
 		"""Load `crop harvest items` from the database"""
-		self.crop_harvest_item_viability_window = []
+		# self.crop_harvest_item_viability_window = [] TODO: SERIA EDITABLE?
 		for crop_harvest_item in self.get_crop_harvest_items():
 			crop_harvest_items_map = {
 				"item_code": crop_harvest_item.item_code_harvest,
@@ -151,7 +149,6 @@ class CropCycle(Document):
 				"valuation_rate": crop_harvest_item.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
 				"expected_harvest_viability_date": add_days(self.start_date, crop_harvest_item.expected_harvest_end),
-				"source_warehouse": crop_harvest_item.source_warehouse,
 				"target_warehouse": crop_harvest_item.target_warehouse
 			}
 
