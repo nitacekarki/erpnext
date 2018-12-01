@@ -248,8 +248,8 @@ def validate_creation(location, start_date):
 
 			return [add_days(d.end_date, 1), d.name]
 
-def prueliminar(doc, method=None):
-	'''Eliminta tasks that were linked to the crop cycle'''
+def eliminate_linked_tasks(doc, method=None):
+	'''Delete tasks that were linked to the crop cycle'''
 	for d in frappe.get_all('Task',
 		fields=['name', 'crop_cycle'],
 		filters={'status': 'Open' or 'Cancel', 'crop_cycle': doc.title}):
@@ -258,4 +258,4 @@ def prueliminar(doc, method=None):
 		current_task.save()
 		current_task.delete()
 
-		frappe.msgprint(_('Se elimino la tarea ' + d.name))
+		# frappe.msgprint(_('Se elimino la tarea ' + d.name))

@@ -21,7 +21,7 @@ function calculate_crop_cycle_qty(frm) {
 }
 
 frappe.ui.form.on('Crop', {
-	refresh: (frm) => {
+	refresh: (frm, cdt, cdn) => {
 		// frm.fields_dict.materials_required.grid.set_column_disp('bom_no', false);
 		frappe.call({
 			method: "erpnext.agriculture.doctype.crop.crop.get_time_uom",
@@ -31,6 +31,7 @@ frappe.ui.form.on('Crop', {
 				frm.set_df_property("date_uom_crop_cycle", "options", time_unit_array);
 			}
 		});
+		frm.set_intro(__("All valuation rates modified in this document will be updated on each item."));
 	},
 	uom_date: (frm) => {
 		calculate_crop_cycle_qty(frm);
@@ -38,8 +39,32 @@ frappe.ui.form.on('Crop', {
 	date_uom_crop_cycle: (frm) => {
 		calculate_crop_cycle_qty(frm);
 	},
-	on_trash: (frm) => {
-		console.log('Se elimino el documento');
+	before_save: (frm) => {
+		frm.doc.crop_input_items.forEach((i) => {
+			frappe.call({
+				method: 'erpnext.agriculture.doctype.crop.crop.update_valuation_rate',
+				args: {
+					item_name: i.item_code,
+					valuation_rate: i.valuation_rate
+				},
+				callback: (r) => {
+					// console.log(r.message);
+				}
+			});
+		});
+
+		frm.doc.crop_harvest_items.forEach((i) => {
+			frappe.call({
+				method: 'erpnext.agriculture.doctype.crop.crop.update_valuation_rate',
+				args: {
+					item_name: i.item_code_harvest,
+					valuation_rate: i.valuation_rate
+				},
+				callback: (r) => {
+					// console.log(r.message);
+				}
+			});
+		});
 	}
 });
 

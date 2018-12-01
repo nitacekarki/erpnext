@@ -14,20 +14,17 @@ class Crop(Document):
 		self.validate_crop_tasks()
 
 	def validate_crop_tasks(self):
-		pass
-		# TODO: REINTEGRAR ESTE CODIGO
-		# for task in self.agriculture_task:
-		# 	if task.start_day > task.end_day:
-		# 		frappe.throw(_("Start day is greater than end day in task '{0}'").format(task.task_name))
+		for task in self.agriculture_task:
+			if task.start_day > task.end_day:
+				frappe.throw(_("Start day is greater than end day in task <b>'{0}'</b>").format(task.task_name))
 
-		# # Verify that the crop period is correct
+		# Verify that the crop period is correct
 		# max_crop_period = max([task.end_day for task in self.agriculture_task])
 		# self.period = max(self.period, max_crop_period)
 
 		# # Sort the crop tasks based on start days,
 		# # maintaining the order for same-day tasks
 		# self.agriculture_task.sort(key=lambda task: task.start_day)
-
 
 @frappe.whitelist()
 def get_item_details(item_code):
@@ -39,9 +36,6 @@ def get_time_uom():
 	prueba_data = frappe.db.get_values('UOM Conversion Factor',
 										filters={'category': 'Time'},
 										fieldname=['to_uom'])
-
-	# naming_series = frappe.get_meta("UOM Conversion Factor").get_field("to").options or ""
-	# prueba_data = prueba_data.split("\n")
 
 	return sorted(set(prueba_data))
 
@@ -76,3 +70,11 @@ def convert_time(time_uom, period_uom, duration_crop_cycle, crop_cycle_period):
 		frappe.msgprint(_("Please add a conversion to seconds in UOM Conversion Factor " + crop_cycle_duration_data[0]['from_uom']))
 
 	return number_of_crop_cycles
+
+@frappe.whitelist()
+def update_valuation_rate(item_name, valuation_rate):
+	item=frappe.get_doc("Item", item_name)
+	item.valuation_rate=valuation_rate
+	item.save()
+
+	# return 'ok'
