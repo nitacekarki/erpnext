@@ -67,7 +67,6 @@ frappe.ui.form.on('Crop Cycle', {
 		}
 	},
 	before_save: (frm) => {
-		// Frappe Call
 		frappe.call({
 			method: 'erpnext.agriculture.doctype.crop_cycle.crop_cycle.validate_creation',
 			args: {
@@ -99,13 +98,11 @@ frappe.ui.form.on("Crop Cycle Task", {
 			frappe.msgprint(__("Save the document first."));
 		}
 	},
-
 	edit_timesheet: function (frm, cdt, cdn) {
 		var child = locals[cdt][cdn];
 		frappe.route_options = { "crop_cycle": frm.doc.name, "task": child.task_id };
 		frappe.set_route("List", "Timesheet");
 	},
-
 	make_timesheet: function (frm, cdt, cdn) {
 		var child = locals[cdt][cdn];
 		frappe.model.with_doctype('Timesheet', function () {
@@ -116,7 +113,6 @@ frappe.ui.form.on("Crop Cycle Task", {
 			frappe.set_route('Form', doc.doctype, doc.name);
 		})
 	},
-
 	status: function (frm, doctype, name) {
 		frm.trigger('tasks_refresh');
 	},
@@ -146,7 +142,34 @@ frappe.ui.form.on("Crop Cycle Harvest Item", {
 			row.transfer_qty = child.qty; //FIXME:
 			row.valuation_rate = child.valuation_rate; //FIXME:
 			frappe.set_route('Form', doc.doctype, doc.name);
-		})
+		});
+	}
+});
+
+frappe.ui.form.on("Crop Cycle Input Item", {
+	view_stock_entry: function (frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		frappe.route_options = { "crop_cycle": frm.doc.name };
+		frappe.set_route("List", "Stock Entry");
+	},
+	make_stock_entry: function (frm, cdt, cdn) {
+		var child = locals[cdt][cdn];
+		frappe.model.with_doctype('Stock Entry', function () {
+			var doc = frappe.model.get_new_doc('Stock Entry');
+			doc.crop_cycle = frm.doc.name;
+			doc.purpose = 'Material Issue';
+			doc.posting_date = child.expected_harvest_viability_date;
+			var row = frappe.model.add_child(doc, 'items');
+			row.item_code = child.item_code;
+			row.qty = child.qty;
+			row.uom = child.uom;
+			row.s_warehouse = child.source_warehouse;
+			row.basic_rate = child.valuation_rate;
+			row.conversion_factor = 1; // FIXME:
+			row.transfer_qty = child.qty; //FIXME:
+			row.valuation_rate = child.valuation_rate; //FIXME:
+			frappe.set_route('Form', doc.doctype, doc.name);
+		});
 	}
 });
 
