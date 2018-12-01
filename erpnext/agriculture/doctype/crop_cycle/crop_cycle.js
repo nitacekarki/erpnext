@@ -138,9 +138,11 @@ frappe.ui.form.on("Crop Cycle Harvest Item", {
 			row.uom = child.uom;
 			row.t_warehouse = child.target_warehouse;
 			row.basic_rate = child.valuation_rate;
+			row.basic_amount = child.qty * child.valuation_rate;
 			row.conversion_factor = 1; // FIXME:
-			row.transfer_qty = child.qty; //FIXME:
-			row.valuation_rate = child.valuation_rate; //FIXME:
+			row.transfer_qty = child.qty;
+			row.amount = child.qty * child.valuation_rate;
+			row.valuation_rate = child.valuation_rate;
 			frappe.set_route('Form', doc.doctype, doc.name);
 		});
 	}
@@ -165,9 +167,11 @@ frappe.ui.form.on("Crop Cycle Input Item", {
 			row.uom = child.uom;
 			row.s_warehouse = child.source_warehouse;
 			row.basic_rate = child.valuation_rate;
+			row.basic_amount = child.qty * child.valuation_rate;
 			row.conversion_factor = 1; // FIXME:
-			row.transfer_qty = child.qty; //FIXME:
-			row.valuation_rate = child.valuation_rate; //FIXME:
+			row.transfer_qty = child.qty;
+			row.amount = child.qty * child.valuation_rate;
+			row.valuation_rate = child.valuation_rate;
 			frappe.set_route('Form', doc.doctype, doc.name);
 		});
 	}
