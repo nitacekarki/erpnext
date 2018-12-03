@@ -68,6 +68,31 @@ frappe.ui.form.on('Crop', {
 	}
 });
 
+
+frappe.ui.form.on("Crop Input Item", {
+	source_warehouse: (frm, cdt, cdn) => {
+		frm.doc.crop_input_items.forEach((item, i) => {
+			frappe.call({
+				method: 'erpnext.stock.utils.get_latest_stock_qty',
+				args: {
+					item_code: item.item_code,
+					warehouse: item.source_warehouse
+				},
+				callback: (r) => {
+					// console.log(r.message);
+					if (r.message) {
+						cur_frm.doc.crop_input_items[i].available_qty_at_warehouse = r.message;
+						cur_frm.refresh_field("crop_input_items");
+					} else {
+						cur_frm.doc.crop_input_items[i].available_qty_at_warehouse = 0;
+						cur_frm.refresh_field("crop_input_items");
+					}
+				}
+			});
+		});
+	}
+});
+
 // frappe.ui.form.on("BOM Item", {
 // 	item_code: (frm, cdt, cdn) => {
 // 		erpnext.crop.update_item_rate_uom(frm, cdt, cdn);
