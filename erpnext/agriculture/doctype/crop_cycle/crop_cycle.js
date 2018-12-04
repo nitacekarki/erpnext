@@ -113,7 +113,7 @@ frappe.ui.form.on("Crop Cycle Task", {
 			frappe.set_route('Form', doc.doctype, doc.name);
 		})
 	},
-	status: function (frm, doctype, name) {
+	status: function (frm) {
 		frm.trigger('tasks_refresh');
 	},
 });

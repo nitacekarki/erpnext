@@ -21,7 +21,7 @@ function calculate_crop_cycle_qty(frm) {
 }
 
 frappe.ui.form.on('Crop', {
-	refresh: (frm, cdt, cdn) => {
+	refresh: (frm) => {
 		// frm.fields_dict.materials_required.grid.set_column_disp('bom_no', false);
 		frappe.call({
 			method: "erpnext.agriculture.doctype.crop.crop.get_time_uom",

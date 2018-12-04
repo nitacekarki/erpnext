@@ -12,6 +12,16 @@ from frappe.model.document import Document
 class Crop(Document):
 	def validate(self):
 		self.validate_crop_tasks()
+		self.validate_linked_warehouse()
+
+	def validate_linked_warehouse(self):
+		for d in frappe.get_all('Crop Cycle',
+		fields=['name', 'crop', 'linked_location'],
+		filters={'docstatus': 1, 'crop': self.name}):
+
+			if (self.linked_location != d.linked_location):
+				frappe.throw(_('''The location cannot be modified as it is being used in a
+								 validated crop cycle <a href="#Form/Crop Cycle/{0}"><b>{0}</b></a>.'''.format(d.name)))
 
 	def validate_crop_tasks(self):
 		for task in self.agriculture_task:
@@ -73,8 +83,12 @@ def convert_time(time_uom, period_uom, duration_crop_cycle, crop_cycle_period):
 
 @frappe.whitelist()
 def update_valuation_rate(item_name, valuation_rate):
-	item=frappe.get_doc("Item", item_name)
-	item.valuation_rate=valuation_rate
-	item.save()
+	item = frappe.get_doc("Item", item_name)
 
+	if float(valuation_rate) != float(item.valuation_rate):
+		# Actualizara el precio
+		item.valuation_rate = valuation_rate
+		item.save()
+	# else:
+		# No actualizara el precio
 	# return 'ok'
