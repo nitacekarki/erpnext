@@ -110,11 +110,14 @@ class CropCycle(Document):
 	def load_crop_inputs(self):
 		"""Load `crop inputs` from the database"""
 		self.crop_cycle_input_items = [] # :TODO: SERA EDITABLE?
+		current_crop=frappe.get_doc("Crop", self.crop)
+		# current_task.crop_cycle=""
+		# current_task.save()
 		for crop_input in self.get_crop_inputs():
 			crop_inputs_map = {
 				"item_code": crop_input.item_code,
 				"item_name": crop_input.item_name,
-				"qty": (float(crop_input.qty) * float(self.area)),
+				"qty": (float(crop_input.qty) * float(self.area) / float(current_crop.planting_area)), #TODO: Agregar funcionalidad de conversion, dependiendo de la UOM de area de tanto Crop como de Location
 				"uom": crop_input.uom,
 				"valuation_rate": crop_input.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_input.expected_harvest_start),
@@ -140,11 +143,12 @@ class CropCycle(Document):
 	def load_crop_harvest_items(self):
 		"""Load `crop harvest items` from the database"""
 		self.crop_harvest_item_viability_window = [] # TODO: SERIA EDITABLE?
+		current_crop=frappe.get_doc("Crop", self.crop)
 		for crop_harvest_item in self.get_crop_harvest_items():
 			crop_harvest_items_map = {
 				"item_code": crop_harvest_item.item_code_harvest,
 				"item_name": crop_harvest_item.item_name_harvest,
-				"qty": (float(crop_harvest_item.qty) * float(self.area)),
+				"qty": (float(crop_harvest_item.qty) * float(self.area) / float(current_crop.planting_area)), #TODO: Agregar funcionalidad de conversion, dependiendo de la UOM de area de tanto Crop como de Location
 				"uom": crop_harvest_item.uom,
 				"valuation_rate": crop_harvest_item.valuation_rate,
 				"expected_harvest_date": add_days(self.start_date, crop_harvest_item.expected_harvest_start),
